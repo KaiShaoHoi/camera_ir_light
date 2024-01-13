@@ -8,5 +8,6 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/KaiShaoHoi/phicomm_k3/issues",
   "requirements": ["requests>=2.26.0"],
-  "version": "1.0.0"
+  "translations": ["en", "zh_CN"],
+  "version": "1.0.1"
 }
