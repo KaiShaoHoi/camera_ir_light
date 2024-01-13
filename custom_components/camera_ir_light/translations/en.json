@@ -6,9 +6,6 @@
                 "data": {
                     "host": "Host",
                     "polling_interval": "Polling Interval (seconds)"
-                },
-                "errors": {
-                    "invalid_host": "Invalid host provided."
                 }
             }
         }
