@@ -6,9 +6,6 @@ from homeassistant.helpers.entity import Entity
 # 导入你的红外摄像头库或相关的库
 from .const import DOMAIN
 
-CONF_HOST = "host"
-CONF_POLLING_INTERVAL = "polling_interval"
-
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the camera_ir_light sensor platform."""
     host = config.get(CONF_HOST)
