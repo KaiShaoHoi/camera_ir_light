@@ -1,0 +1,16 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "红外光传感器配置",
+                "data": {
+                    "host": "主机地址",
+                    "polling_interval": "轮询间隔（秒）"
+                },
+                "errors": {
+                    "invalid_host": "提供的主机地址无效。"
+                }
+            }
+        }
+    }
+}

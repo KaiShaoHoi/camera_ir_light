@@ -1,0 +1,1 @@
+DOMAIN = "camera_ir_light"
