@@ -1,7 +1,6 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 import voluptuous as vol
-from homeassistant.components import translation
 from .const import DOMAIN
 
 # 定义配置常量
