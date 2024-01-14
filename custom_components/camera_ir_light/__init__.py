@@ -26,7 +26,5 @@ async def async_setup(hass: HomeAssistant, config: dict):
     if DOMAIN in config:
         # 配置验证
         config[DOMAIN] = CONFIG_SCHEMA(config[DOMAIN])
-    
-    if translation.LOCALE_DOMAIN not in hass.data:
-        hass.data[translation.LOCALE_DOMAIN] = "zh_CN"
+
     return True

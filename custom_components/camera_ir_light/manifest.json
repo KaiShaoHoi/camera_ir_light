@@ -3,7 +3,7 @@
   "name": "Camera IR Light",
   "codeowners": ["@chaobt"],
   "config_flow": true,
-  "dependencies": ["translation"],
+  "dependencies": [],
   "documentation": "https://github.com/KaiShaoHoi/phicomm_k3",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/KaiShaoHoi/phicomm_k3/issues",
