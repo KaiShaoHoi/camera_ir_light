@@ -61,7 +61,7 @@ class IRLightSensor(Entity):
             self._state = STATE_OFF
             # 在实际使用中，可以记录日志或者通过其他途径报告错误
             print(f"Error updating sensor state: {e}")
-        finally:
-            # 将等待时间移动到 finally 外部，确保不管是否发生异常，都会等待指定的轮询间隔时间
+
+        # 将等待时间移动到 finally 外部，确保不管是否发生异常，都会等待指定的轮询间隔时间
         time.sleep(self._polling_interval)
 
