@@ -4,7 +4,7 @@ from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.helpers.entity import Entity
 
 # 导入你的红外摄像头库或相关的库
-from .const import DOMAIN
+from .const import DOMAIN, CONF_HOST, CONF_POLLING_INTERVAL
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the camera_ir_light sensor platform."""

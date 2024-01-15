@@ -3,10 +3,6 @@ from homeassistant.helpers import config_validation as cv
 import voluptuous as vol
 from .const import DOMAIN
 
-# 定义配置常量
-CONF_HOST = "host"
-CONF_POLLING_INTERVAL = "polling_interval"
-
 # 定义配置模式
 CONFIG_SCHEMA = vol.Schema(
     {
