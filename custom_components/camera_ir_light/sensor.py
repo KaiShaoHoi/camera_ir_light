@@ -40,8 +40,8 @@ class IRLightSensor(Entity):
         try:
             color_flag = False
             blackwhite_flag = False
-            
-            with self._session.get(self._file_url, stream=True) as response:
+
+            with self._session.get(self._file_url, stream=True, timeout=10) as response:
                 for line in response.iter_lines(decode_unicode=True):
                     if line and "display switch(blackwhite -> color)." in line:
                         color_flag = True
@@ -62,4 +62,6 @@ class IRLightSensor(Entity):
             # 在实际使用中，可以记录日志或者通过其他途径报告错误
             print(f"Error updating sensor state: {e}")
         finally:
-            time.sleep(self._polling_interval)
+            # 将等待时间移动到 finally 外部，确保不管是否发生异常，都会等待指定的轮询间隔时间
+        time.sleep(self._polling_interval)
+
