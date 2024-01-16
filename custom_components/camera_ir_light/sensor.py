@@ -1,29 +1,67 @@
+import logging
+from datetime import timedelta
 import requests
-import time
-from homeassistant.const import STATE_ON, STATE_OFF
+from homeassistant.const import CONF_HOST, STATE_ON, STATE_OFF
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.update_coordinator import (
+    DataUpdateCoordinator,
+    UpdateFailed,
+)
+from homeassistant.util import Throttle
+from .const import DOMAIN, CONF_POLLING_INTERVAL
 
-# 导入你的红外摄像头库或相关的库
-from .const import DOMAIN, CONF_HOST, CONF_POLLING_INTERVAL
+_LOGGER = logging.getLogger(__name__)
+
+DEFAULT_POLLING_INTERVAL = timedelta(seconds=60)
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the camera_ir_light sensor platform."""
     host = config.get(CONF_HOST)
-    polling_interval = config.get(CONF_POLLING_INTERVAL, 60)
+    polling_interval = config.get(CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL)
 
-    add_entities([IRLightSensor(host, polling_interval)], True)
+    coordinator = IRLightSensorDataCoordinator(hass, host, polling_interval)
+    add_entities([IRLightSensor(coordinator, host)], True)
+
+
+class IRLightSensorDataCoordinator(DataUpdateCoordinator):
+    """Class to manage fetching data from the camera IR light sensor."""
+
+    def __init__(self, hass, host, interval):
+        """Initialize."""
+        self.host = host
+        self.file_url = f"http://{self.host}/log/syslog.txt"
+
+        super().__init__(hass, _LOGGER, name="IR Light Sensor", update_interval=interval)
+
+    @Throttle(DEFAULT_POLLING_INTERVAL)
+    def update(self):
+        """Fetch data from IR light sensor."""
+        try:
+            response = requests.get(self.file_url, timeout=10)
+            text = response.text
+
+            color_flag = "display switch(blackwhite -> color)." in text
+            blackwhite_flag = "display switch(color -> blackwhite)." in text
+
+            if blackwhite_flag:
+                self.data = STATE_ON
+            elif color_flag:
+                self.data = STATE_OFF
+            else:
+                self.data = STATE_ON
+        except Exception as e:
+            _LOGGER.error(f"Error updating sensor state: {e}")
+            self.data = STATE_OFF
 
 
 class IRLightSensor(Entity):
     """Representation of a camera_ir_light sensor."""
 
-    def __init__(self, host, polling_interval):
+    def __init__(self, coordinator, host):
         """Initialize the sensor."""
+        self.coordinator = coordinator
         self._host = host
-        self._polling_interval = polling_interval
-        self._state = None  # 初始状态为未知
-        self._file_url = f"http://{self._host}/log/syslog.txt"
-        self._session = requests.Session()
+        self._state = None
 
     @property
     def name(self):
@@ -33,35 +71,13 @@ class IRLightSensor(Entity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._state
+        return self.coordinator.data
 
-    def update(self):
+    @property
+    def should_poll(self):
+        """Return the polling state."""
+        return False
+
+    async def async_update(self):
         """Update the sensor."""
-        try:
-            color_flag = False
-            blackwhite_flag = False
-
-            with self._session.get(self._file_url, stream=True, timeout=10) as response:
-                for line in response.iter_lines(decode_unicode=True):
-                    if line and "display switch(blackwhite -> color)." in line:
-                        color_flag = True
-                    elif line and "display switch(color -> blackwhite)." in line:
-                        blackwhite_flag = True
-                        break  # 一旦匹配到 "display switch(color -> blackwhite)." 就停止遍历
-
-            # 根据标志位设置 self._state
-            if blackwhite_flag:
-                self._state = STATE_ON
-            elif color_flag:
-                self._state = STATE_OFF
-            else:
-                self._state = STATE_ON
-
-        except requests.RequestException as e:
-            self._state = STATE_OFF
-            # 在实际使用中，可以记录日志或者通过其他途径报告错误
-            print(f"Error updating sensor state: {e}")
-
-        # 将等待时间移动到 finally 外部，确保不管是否发生异常，都会等待指定的轮询间隔时间
-        time.sleep(self._polling_interval)
-
+        await self.hass.async_add_executor_job(self.coordinator.update)
