@@ -1,7 +1,7 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 import voluptuous as vol
-from .const import DOMAIN
+from .const import DOMAIN, CONF_HOST, CONF_POLLING_INTERVAL
 
 # 定义配置模式
 CONFIG_SCHEMA = vol.Schema(
